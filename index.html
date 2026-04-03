@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Periods Assistant</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  font-family:"Poppins","Segoe UI",sans-serif;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  background:linear-gradient(180deg,#ff9acb,#ffb6d9);
+}
+
+/* ================= WELCOME PAGE ================= */
+#welcome{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.welcome-card{
+  background:#fff4f8;
+  width:90%;
+  max-width:460px;
+  height:90vh;
+  border-radius:36px;
+  padding:48px 36px;
+  text-align:center;
+  box-shadow:0 35px 70px rgba(0,0,0,.25);
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+
+.welcome-top h1{
+  color:#b0004d;
+  font-size:30px;
+}
+
+.welcome-top p{
+  color:#8a2c55;
+  font-size:14px;
+}
+
+.welcome-middle{
+  font-size:88px;
+  animation:floatFlower 3.5s ease-in-out infinite;
+}
+
+@keyframes floatFlower{
+  0%{ transform:translateY(0); }
+  50%{ transform:translateY(-16px); }
+  100%{ transform:translateY(0); }
+}
+
+.next-btn{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:24px;
+  background:linear-gradient(135deg,#ff5fa2,#ff85b3);
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+}
+
+/* ================= APP ================= */
+#app{
+  display:none;
+  height:100vh;
+  justify-content:center;
+  align-items:center;
+}
+
+.container{
+  width:100%;
+  max-width:420px;
+  height:100vh;
+  background:#fff0f6;
+  border-radius:26px;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+
+/* Header */
+.header{
+  background:linear-gradient(135deg,#ff4f9a,#ff85b3);
+  color:white;
+  padding:14px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.back-btn{
+  background:rgba(255,255,255,.25);
+  border:none;
+  color:white;
+  padding:6px 12px;
+  border-radius:16px;
+  cursor:pointer;
+}
+
+/* Topics */
+.topics{
+  display:flex;
+  gap:8px;
+  padding:12px;
+  background:#ffe0ec;
+  overflow-x:auto;
+}
+
+.topics button{
+  padding:8px 14px;
+  border:none;
+  border-radius:18px;
+  background:#ff5fa2;
+  color:white;
+  font-size:12px;
+  cursor:pointer;
+}
+
+/* Chat */
+.chat{
+  flex:1;
+  padding:14px;
+  overflow-y:auto;
+}
+
+.msg{
+  max-width:85%;
+  padding:12px 14px;
+  border-radius:18px;
+  margin-bottom:12px;
+  font-size:14px;
+  line-height:1.5;
+}
+
+.bot{ background:#ffe0ec; }
+.user{ background:#ff4f9a; color:white; margin-left:auto; }
+
+/* Input */
+.input{
+  display:flex;
+  padding:12px;
+  background:#ffe0ec;
+}
+
+.input input{
+  flex:1;
+  border:none;
+  border-radius:20px;
+  padding:10px;
+  outline:none;
+}
+
+.input button{
+  width:42px;
+  height:42px;
+  margin-left:8px;
+  border:none;
+  border-radius:50%;
+  background:#ff4f9a;
+  color:white;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<!-- WELCOME -->
+<div id="welcome">
+  <div class="welcome-card">
+    <div class="welcome-top">
+      <h1>🌸 My Period Assistant</h1>
+      <p>Gentle help for cycles, cramps & care</p>
+    </div>
+    <div class="welcome-middle">🌸</div>
+    <button class="next-btn" onclick="start()">Continue</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+<div class="container">
+
+  <div class="header">
+    <button class="back-btn" onclick="goBack()">← Back</button>
+    <h2>🌸 Period Assistant</h2>
+    <span></span>
+  </div>
+
+  <div class="topics">
+    <button onclick="quick('cramps')">Cramps</button>
+    <button onclick="quick('diet')">Diet</button>
+    <button onclick="quick('flow')">Flow</button>
+    <button onclick="quick('hygiene')">Hygiene</button>
+    <button onclick="quick('mood')">Mood</button>
+  </div>
+
+  <div class="chat" id="chat">
+    <div class="msg bot">
+      Hi 💕 I’m your Period Assistant.<br><br>
+      You can track your periods like:<br>
+      • <b>log period 2026-01-04</b><br><br>
+      I am also here to assist you with your period-related queries 🌸
+    </div>
+  </div>
+
+  <div class="input">
+    <input id="input" placeholder="Ask your question here..." />
+    <button onclick="send()">➤</button>
+  </div>
+
+</div>
+</div>
+
+<script>
+const welcome=document.getElementById("welcome");
+const app=document.getElementById("app");
+const chat=document.getElementById("chat");
+const input=document.getElementById("input");
+
+function start(){
+  welcome.style.display="none";
+  app.style.display="flex";
+}
+
+function goBack(){
+  app.style.display="none";
+  welcome.style.display="flex";
+}
+
+function add(text,type){
+  const d=document.createElement("div");
+  d.className="msg "+type;
+  d.innerHTML=text.replace(/\n/g,"<br>");
+  chat.appendChild(d);
+  chat.scrollTop=chat.scrollHeight;
+}
+
+function send(){
+  const t=input.value.trim();
+  if(!t) return;
+  add(t,"user");
+  input.value="";
+  setTimeout(()=>reply(t.toLowerCase()),400);
+}
+
+function quick(t){
+  add(t,"user");
+  reply(t);
+}
+
+function reply(m){
+  let r="I’m here with you 💗";
+
+  /* ================= PERIOD TRACKING ================= */
+  if(m.startsWith("log period")){
+    const date=m.split(" ")[2];
+    if(!date){
+      r="Please log like this:\nlog period YYYY-MM-DD";
+    } else {
+      localStorage.setItem("lastPeriod",date);
+      r="🌸 Your period has been logged for "+date;
+    }
+  }
+
+  else if(m.includes("next period")){
+    const last=localStorage.getItem("lastPeriod");
+    if(!last){
+      r="Please log your last period first.";
+    } else {
+      const d=new Date(last);
+      d.setDate(d.getDate()+28);
+      r="🌼 Your next expected period is around "+d.toDateString();
+    }
+  }
+
+  else if(m.includes("cycle day")){
+    const last=localStorage.getItem("lastPeriod");
+    if(!last){
+      r="Please log your last period first.";
+    } else {
+      const start=new Date(last);
+      const today=new Date();
+      const day=Math.floor((today-start)/(1000*60*60*24))+1;
+      r="📅 You are currently on cycle day "+day;
+    }
+  }
+
+  else if(m.includes("reset period")){
+    localStorage.removeItem("lastPeriod");
+    r="Your period data has been reset 🌸";
+  }
+
+  /* ================= OVULATION & FERTILITY ================= */
+  else if(m.includes("ovulation")){
+    r="🌼 Ovulation usually occurs around day 14 in a 28-day cycle.\n\nSigns include:\n• Clear stretchy discharge\n• Mild lower abdominal pain\n• Increased energy";
+  }
+
+  else if(m.includes("fertile")){
+    r="Your fertile window is usually 4–5 days before ovulation and the day of ovulation.\n\nThis app gives general awareness, not pregnancy prediction.";
+  }
+
+  else if(m.includes("safe days")){
+    r="Safe days are the days outside your fertile window.\n\nThey vary depending on cycle length and are not 100% reliable for contraception.";
+  }
+
+  /* ================= PMS & SYMPTOMS ================= */
+  else if(m.includes("pms")){
+    r="PMS symptoms may include:\n• Mood swings\n• Bloating\n• Breast tenderness\n• Fatigue\n\nRest and gentle care help a lot 💗";
+  }
+
+  else if(m.includes("spotting")){
+    r="Light spotting can happen due to ovulation, hormonal changes, or stress.\n\nIf it happens often or is heavy, consult a doctor.";
+  }
+
+  else if(m.includes("late") || m.includes("delayed")){
+    r="Periods can be delayed due to stress, travel, illness, or hormonal shifts.\n\nIf delayed more than 2 weeks, a doctor visit is recommended.";
+  }
+
+  else if(m.includes("early period")){
+    r="Early periods can happen due to stress or hormonal imbalance.\n\nOccasional changes are normal.";
+  }
+
+  /* ================= PAIN & DISCOMFORT ================= */
+  else if(m.includes("cramp") || m.includes("pain")){
+    r="🌸 Cramps happen due to uterine contractions.\n\nRelief tips:\n• Heat pad\n• Gentle stretching\n• Warm fluids\n• Rest";
+  }
+
+  else if(m.includes("back pain")){
+    r="Lower back pain is common during periods.\n\nTry heat, light stretching, and proper posture.";
+  }
+
+  else if(m.includes("headache")){
+    r="Hormonal changes can cause headaches during periods.\n\nHydration and rest usually help.";
+  }
+
+  else if(m.includes("fatigue") || m.includes("tired")){
+    r="Feeling tired during periods is very common.\n\nListen to your body, rest more, and eat nourishing foods 💕";
+  }
+
+  /* ================= YOGA & EXERCISE ================= */
+  else if(m.includes("yoga")){
+    r="🧘 Period-friendly yoga poses:\n• Child’s pose\n• Cat-Cow\n• Supine twist\n• Legs up the wall\n\nAvoid intense core work.";
+  }
+
+  else if(m.includes("exercise") || m.includes("workout")){
+    r="Light exercise is safe during periods.\n\nWalking, stretching, and yoga are great.\nAvoid over-exertion.";
+  }
+
+  else if(m.includes("pranayama") || m.includes("breathing")){
+    r="🌬️ Slow breathing and pranayama help reduce cramps and anxiety.\n\nTry deep belly breathing or Anulom Vilom.";
+  }
+
+  /* ================= DIET & NUTRITION ================= */
+  else if(m.includes("diet") || m.includes("food")){
+    r="🥗 Period-friendly foods:\n• Fruits & vegetables\n• Iron-rich foods\n• Nuts & seeds\n• Warm meals";
+  }
+
+  else if(m.includes("iron") || m.includes("anemia")){
+    r="Iron is important due to blood loss during periods.\n\nInclude spinach, dates, legumes, and jaggery.";
+  }
+
+  else if(m.includes("bloating")){
+    r="Bloating is common before and during periods.\n\nReduce salty foods and drink plenty of water.";
+  }
+
+  else if(m.includes("caffeine")){
+    r="Too much caffeine may worsen cramps and anxiety.\n\nTry limiting tea or coffee during periods.";
+  }
+
+  /* ================= FLOW & HYGIENE ================= */
+  else if(m.includes("flow") || m.includes("bleeding")){
+    r="🩸 Normal flow lasts 3–7 days.\n\nSee a doctor if bleeding is very heavy or lasts unusually long.";
+  }
+
+  else if(m.includes("hygiene")){
+    r="🌸 Hygiene tips:\n• Change pads every 4–6 hours\n• Wash hands\n• Avoid scented products";
+  }
+
+  /* ================= MOOD & EMOTIONS ================= */
+  else if(m.includes("mood") || m.includes("sad") || m.includes("angry") || m.includes("anxious")){
+    r="Hormonal changes can affect emotions 💗\n\nRest, talk to someone you trust, and be gentle with yourself.";
+  }
+
+  /* ================= DOCTOR ADVICE ================= */
+  else if(m.includes("doctor") || m.includes("hospital")){
+    r="🩺 See a doctor if:\n• Pain is severe\n• Bleeding is very heavy\n• Periods stop for months";
+  }
+
+  add(r,"bot");
+}
+
+
+input.addEventListener("keypress",e=>{
+  if(e.key==="Enter") send();
+});
+</script>
+
+</body>
+</html>
