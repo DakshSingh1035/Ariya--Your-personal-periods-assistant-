@@ -6,6 +6,7 @@ A simple web-based assistant designed to help track and manage menstrual cycles.
 - Cycle tracking
 - Clean UI
 - Lightweight and fast
+- Swift and Safe Guidance during Periods
 
 ## Tech Used
 - HTML
